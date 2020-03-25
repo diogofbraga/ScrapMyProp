@@ -4,25 +4,47 @@ import requests
 import pandas as pd
 
 # CSV Header
-df = pd.DataFrame([], columns=['Nome', 'Finalidade', 'Tipo de Imóvel', 'Estado',
-                               'Preço de venda', 'Distrito', 'Concelho', 'Freguesia', 'Referência'])
+df = pd.DataFrame([], columns=['Nome', 'Nº Quartos', 'Nº Casas de Banho', 'Nº Estacionamentos', 'Área Útil',
+                               'Área Terreno', 'Finalidade', 'Tipo de Imóvel', 'Estado',
+                               'Preço de Venda', 'Distrito', 'Concelho', 'Freguesia', 'Referência'])
 df.to_csv('Era.csv', index=False, header=True)
 
 
 def parseHTML(url):
     text_url = url
-    # Fazer pedido GET para obter o objecto HTML em formato texto
+
     text_content = requests.get(text_url).text
-    # Criar objeto BS, usando o lxml
+
     text_soup = BeautifulSoup(text_content, 'lxml')
-    # Obter apenas o texto da pagina HTML, sem as tags deste
+
     return text_soup
 
 
 def imovelFeatures(soup):
 
+    # Nome
     nome = soup.find('span', {'class': 'openSansR t18 cinza33 line_height150'})
 
+    # Bloco de características principais
+    bloco_caracteristicas = soup.find('ul', {'class': 'bloco-caracteristicas'})
+
+    principais = {}  # necessitei deste dicionário porque há alguns características principais que não existem sempre
+
+    if bloco_caracteristicas is not None:
+        for li in bloco_caracteristicas.find_all('li'):
+            spans = li.find_all('span')
+            if spans[0]["title"] == "Quartos":
+                principais["quartos"] = spans[1].getText()
+            elif spans[0]["title"] == "C. Banho":
+                principais["casas_de_banho"] = spans[1].getText()
+            elif spans[0]["title"] == "Estacionamento":
+                principais["estacionamento"] = spans[1].getText()
+            elif spans[0]["title"] == "Área Útil":
+                principais["area_util"] = spans[1].getText()
+            elif spans[0]["title"] == "Área Terreno":
+                principais["area_terreno"] = spans[1].getText()
+
+    # Características adicionais
     finalidade = soup.find(
         id="ctl00_ContentPlaceHolder1_lbl_imovel_show_finalidade")
 
@@ -47,8 +69,10 @@ def imovelFeatures(soup):
     ref = soup.find(
         id="ctl00_ContentPlaceHolder1_lbl_imovel_show_ref")
 
-    obj = df.append({'Nome': nome.text, 'Finalidade': finalidade.text, 'Tipo de Imóvel': tipoDeImovel.text,
-                     'Estado': estado.text, 'Preço de venda': preco_venda.text, 'Distrito': distrito.text,
+    obj = df.append({'Nome': nome.text, 'Nº Quartos': principais.get("quartos", None), 'Nº Casas de Banho': principais.get("casas_de_banho", None),
+                     'Nº Estacionamentos': principais.get("estacionamento", None), 'Área Útil': principais.get("area_util", None),
+                     'Área Terreno': principais.get("area_terreno", None), 'Finalidade': finalidade.text, 'Tipo de Imóvel': tipoDeImovel.text,
+                     'Estado': estado.text, 'Preço de Venda': preco_venda.text, 'Distrito': distrito.text,
                      'Concelho': concelho.text, 'Freguesia': freguesia.text, 'Referência': ref.text}, ignore_index=True)
     obj.to_csv('Era.csv', mode='a', header=False, index=False)
 
@@ -82,5 +106,4 @@ def main():
         i = i+1
 
 
-# correr o script
 main()
