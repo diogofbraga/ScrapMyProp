@@ -34,6 +34,10 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     principais = {}  # Necessitei deste dicionário porque há alguns características principais que não existem sempre
 
     # Método de webscraping: estas características estavam dentro de uma lista de 'span's, portanto tive que fazer uma abordagem diferente
+    # O dicionário 'principais' vai ter as caracteristicas que existem no bloco (a key será o "title" = spans[0]), e o 'value' vai ser o spans[1] associado a cada elemento
+    # Por exemplo, cada elemento da lista tem: '<li><span class="icon-imovel-quartos" title="Quartos"> </span><span class="num">3</span></li>'
+    # Tenho que ir buscar os spans, neste caso: os "Quartos" e depois o "3", daí ter metido isto numa lista chamada 'spans'
+    # O index 0 é o "Quartos" e o index 1 é o "3"
     if bloco_caracteristicas is not None:
         for li in bloco_caracteristicas.find_all('li'):
             spans = li.find_all('span')
