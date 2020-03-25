@@ -93,9 +93,7 @@ def main():
 
     while(1):
         # Url das páginas da 'Era.pt', aceder num ciclo às páginas existentes
-        # '{0}".format(i)' -> método para introduzir variável de instância na string associada ao url
-        htmlBraga = "https://www.era.pt/imoveis/comprar/-/braga/braga?pg={0}".format(
-            i)
+        htmlBraga = f"https://www.era.pt/imoveis/comprar/-/braga/braga?pg={i}"
 
         print(htmlBraga)
 
