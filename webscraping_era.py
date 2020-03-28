@@ -6,7 +6,11 @@ import pandas as pd
 # CSV Header
 df = pd.DataFrame([], columns=['Nome', 'Nº Quartos', 'Nº Casas de Banho', 'Nº Estacionamentos', 'Área Útil',
                                'Área Terreno', 'Finalidade', 'Tipo de Imóvel', 'Estado',
-                               'Preço de Venda', 'Distrito', 'Concelho', 'Freguesia', 'Referência'])
+                               'Preço de Venda', 'Distrito', 'Concelho', 'Freguesia', 'Referência',
+                               'Infraestruturas', 'Tipo de modalidade', 'Zona', 'Constituição',
+                               'Sistema de abastecimento de água', 'Caixilharia das Janelas',
+                               'Climatização', 'Domótica', 'Edifício', 'Garagem',
+                               'Vistas', 'Exposição Solar', 'Segurança'])
 df.to_csv('dados_era.csv', index=False, header=True)
 
 
@@ -31,26 +35,18 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     # Método de webscraping: procurar tags 'ul' com a classe 'bloco-caracteristicas'
     bloco_caracteristicas = soup.find('ul', {'class': 'bloco-caracteristicas'})
 
-    principais = {}  # Necessitei deste dicionário porque há alguns características principais que não existem sempre
+    features = {}
 
     # Método de webscraping: estas características estavam dentro de uma lista de 'span's, portanto tive que fazer uma abordagem diferente
-    # O dicionário 'principais' vai ter as caracteristicas que existem no bloco (a key será o "title" = spans[0]), e o 'value' vai ser o spans[1] associado a cada elemento
-    # Por exemplo, cada elemento da lista tem: '<li><span class="icon-imovel-quartos" title="Quartos"> </span><span class="num">3</span></li>'
-    # Tenho que ir buscar os spans, neste caso: os "Quartos" e depois o "3", daí ter metido isto numa lista chamada 'spans'
-    # O index 0 é o "Quartos" e o index 1 é o "3"
+    # O dicionário 'features' vai ter as caracteristicas que existem no bloco (a key será o "title" = spans[0]), e o 'value' vai ser o spans[1] associado a cada elemento
     if bloco_caracteristicas is not None:
         for li in bloco_caracteristicas.find_all('li'):
-            spans = li.find_all('span')
-            if spans[0]["title"] == "Quartos":
-                principais["quartos"] = spans[1].getText()
-            elif spans[0]["title"] == "C. Banho":
-                principais["casas_de_banho"] = spans[1].getText()
-            elif spans[0]["title"] == "Estacionamento":
-                principais["estacionamento"] = spans[1].getText()
-            elif spans[0]["title"] == "Área Útil":
-                principais["area_util"] = spans[1].getText()
-            elif spans[0]["title"] == "Área Terreno":
-                principais["area_terreno"] = spans[1].getText()
+            key = li.find(
+                'span')['title']
+            value = li.find(
+                'span', {'class': 'num'})
+            if value is not None:
+                features[key] = value.getText()
 
     # ------ Características adicionais ------
     # Método de webscraping: cada característica tinha um id associado, portanto estas características fui diretamente pelo id
@@ -78,12 +74,34 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     ref = soup.find(
         id="ctl00_ContentPlaceHolder1_lbl_imovel_show_ref")
 
-    # Adicionar a informação extraída ao csv
-    obj = df.append({'Nome': nome.text, 'Nº Quartos': principais.get("quartos", None), 'Nº Casas de Banho': principais.get("casas_de_banho", None),
-                     'Nº Estacionamentos': principais.get("estacionamento", None), 'Área Útil': principais.get("area_util", None),
-                     'Área Terreno': principais.get("area_terreno", None), 'Finalidade': finalidade.text, 'Tipo de Imóvel': tipoDeImovel.text,
-                     'Estado': estado.text, 'Preço de Venda': preco_venda.text, 'Distrito': distrito.text,
-                     'Concelho': concelho.text, 'Freguesia': freguesia.text, 'Referência': ref.text}, ignore_index=True)
+    # ------ Bloco de características extra ------
+    # Método de webscraping: procurar tags 'div' com a classe 'imovel_show_list_caracteristicas box'
+    box_caract = soup.find_all(
+        'div', {'class': 'imovel_show_list_caracteristicas box'})
+
+    # Método de webscraping: (semelhante ao método das características principais)
+    for item in box_caract:
+        key = item.find(
+            'span', {'class': 'caracteristicas_titulo_nome'})
+        value = item.find(
+            'span', {'class': 'caracteristicas_descricao'})
+        features[key.getText()] = value.getText()
+
+    # ------ Adicionar a informação extraída ao csv ------
+    obj = df.append({'Nome': nome.text, 'Nº Quartos': features.get("Quartos", None), 'Nº Casas de Banho': features.get("C. Banho", None),
+                     'Nº Estacionamentos': features.get("Estacionamento", None), 'Área Útil': features.get("Área Útil", None),
+                     'Área Terreno': features.get("Área Terreno", None), 'Finalidade': finalidade.text,
+                     'Tipo de Imóvel': tipoDeImovel.text, 'Estado': estado.text, 'Preço de Venda': preco_venda.text,
+                     'Distrito': distrito.text, 'Concelho': concelho.text, 'Freguesia': freguesia.text, 'Referência': ref.text,
+                     'Infraestruturas': features.get("Infraestruturas", None), 'Tipo de modalidade': features.get("Tipo", None),
+                     'Zona': features.get("Zona", None), 'Constituição': features.get('Geral', None),
+                     'Sistema de abastecimento de água': features.get('Água', None), 'Caixilharia das Janelas': features.get('Caixilharia', None),
+                     'Climatização': features.get('Climatização', None), 'Domótica': features.get('Domótica', None),
+                     'Edifício': features.get('Edifício', None), 'Garagem': features.get('Garagem', None),
+                     'Vistas': features.get('Vistas', None), 'Exposição Solar': features.get('Exposição Solar', None),
+                     'Segurança': features.get('Segurança', None)
+                     }, ignore_index=True)
+
     obj.to_csv('dados_era.csv', mode='a', header=False, index=False)
 
 
