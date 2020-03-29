@@ -15,7 +15,7 @@ headers = {
 
 # CSV Header
 df = pd.DataFrame([], columns=['Nome', ...])
-df.to_csv('dados_idealista.csv', index=False, header=True)
+df.to_csv('dados_imovirtual.csv', index=False, header=True)
 
 
 def parseHTML(url):  # Parsing Html
@@ -31,6 +31,9 @@ def parseHTML(url):  # Parsing Html
 
 def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
+    nome = soup.find('h1', class_="css-1ld8fwi").getText()
+    print(nome)
+
     return
 
 
@@ -39,40 +42,29 @@ def main():
     i = 1
 
     while(1):
-        # Url das páginas da 'Era.pt', aceder num ciclo às páginas existentes
-        htmlIdealista = f"https://www.idealista.pt/comprar-casas/braga/pagina-{i}"
+        # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
+        htmlBraga = f"https://www.imovirtual.com/comprar/braga/?search%5Bregion_id%5D=3&search%5Bsubregion_id%5D=36&page={i}"
 
-        print(htmlIdealista)
+        print(htmlBraga)
 
         # Final das páginas
         if i == 3:
             break
 
         # Realizar o parsing da página associada ao iterador do ciclo
-        soup = parseHTML(htmlIdealista)
+        soup = parseHTML(htmlBraga)
 
-        # Encontrar o link de cada imóvel presente na página, visto que a página esta dividida em 'article' entao é só aceder a cada um e sacar o href
-        # 'href=True' faz com que depois seja possível aceder a esse atributo, o que vai acontecer já em baixo
+        # Encontrar o link de cada imóvel presente na página, através do id associado
+        container = soup.find_all(
+            'article', id=re.compile("offer-item-ad_id.*"))
 
-        container = soup.find_all('div', class_='item-info-container')
-
-        table = []
-
-        for item in container:
-            table.append(
-                item.find('a', class_='item-link', href=True))
-
-        # print(table)
-
-        # Para cada imóvel da página, aceder ao href e adicionar 'https://www.idealista.pt' no início para o url ficar a funcionar
-        for tableCode in table:
-            tableCode['href'] = "https://www.idealista.pt" + tableCode['href']
-            # print(tableCode['href'])
+        # print(container)
 
         # Para cada link do imóvel presente no imóvel, ir buscar as features associadas a esse através do método imovelFeatures(imovel)
-        # for tableCode in data:
-        #    imovel = parseHTML(tableCode['href'])
-        #    imovelFeatures(imovel)
+        for tableCode in container:
+            # print(tableCode['data-url'])
+            imovel = parseHTML(tableCode['data-url'])
+            imovelFeatures(imovel)
 
         # Aumentar o iterador associado às páginas
         i = i+1

@@ -31,9 +31,6 @@ def parseHTML(url):  # Parsing Html
 
 def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
-    #nome = soup.find('h1', class_='detailPropertyTitle')
-    # print(nome.getText())
-
     return
 
 
@@ -68,7 +65,7 @@ def main():
         # Para cada imóvel da página, aceder ao href e adicionar 'https://casa.sapo.pt' no início para o url ficar a funcionar
         for tableCode in table:
             tableCode['href'] = "https://casa.sapo.pt" + tableCode['href']
-            # print(tableCode['href'])
+            print(tableCode['href'])
 
         # Para cada link do imóvel presente no imóvel, ir buscar as features associadas a esse através do método imovelFeatures(imovel)
         for tableCode in table:
