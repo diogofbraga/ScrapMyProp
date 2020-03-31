@@ -63,6 +63,8 @@ def parseHTML(url):  # Parsing Html
 def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
     nome = soup.find('h1', {"class" : "css-1ld8fwi"})
+    if nome is not None:
+        nome=nome.text
 
     p=soup.find('div', {"class": "css-1vr19r7"})
     if p is not None:
@@ -134,7 +136,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             value="True"
             features[key]=value
     
-    obj = df.append({'Nome': nome.text, 'Preço': preco, 'Preço m/2': precom2, 'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
+    obj = df.append({'Nome': nome, 'Preço': preco, 'Preço m/2': precom2, 'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
                     'Freguesia': features.get("Freguesia", None), 'Tipologia': features.get("tipologia", None), 'Nº Casas de Banho': features.get("casas de banho", None),
                     'Área útil m/2': features.get("área útil (m/2)", None), 'Área bruta m/2': features.get("área bruta (m/2)", None),
                     'Ano construção': features.get("ano de construção", None), 'Certificado energético': features.get("certificado energético", None),
