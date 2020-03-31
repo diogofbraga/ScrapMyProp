@@ -76,7 +76,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     pm2=soup.find('div', {"class": "css-zdpt2t"})
     if pm2 is not None:
         precom2=re.match("[0123456789 ]+", pm2.getText())
-        if preco is not None:
+        if precom2 is not None:
             precom2=precom2.group(0)
     
     propriedades=soup.find('div', {"class": "css-2fnk9o"})
