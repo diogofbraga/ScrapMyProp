@@ -41,15 +41,19 @@ df.to_csv('dados_imovirtual.csv', index=False, header=True)
 def parseHTML(url):  # Parsing Html
     headers = requests.utils.default_headers()
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:74.0) Gecko/20100101 Firefox/74.0',
+        'User-Agent': 'Windows NT 10.0; Win64; x64',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Referer': 'https://google.pt',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'pt-PT,pt;q=0.8,en;q=0.5,en-US;q=0.3'
     }
+    proxies = {
+        'http': 'http://192.168.1.9:51895',
+        'https': 'https://192.168.1.9:51895',
+    }
     text_url = url
 
-    text_content = requests.get(text_url, headers=headers).text
+    text_content = requests.get(text_url, headers=headers, proxies=proxies).text
 
     text_soup = BeautifulSoup(text_content, 'lxml')
 
@@ -63,10 +67,15 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     p=soup.find('div', {"class": "css-1vr19r7"})
     if p is not None:
         preco=re.match("[0123456789 ]+", p.getText())
+    else:
+        preco=None
+    
     
     pm2=soup.find('div', {"class": "css-zdpt2t"})
     if pm2 is not None:
         precom2=re.match("[0123456789 ]+", pm2.getText())
+    else:
+        precom2=None
     
     propriedades=soup.find('div', {"class": "css-2fnk9o"})
     if propriedades is not None:
@@ -81,11 +90,17 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             a=li.find('strong').getText()
             key=li.find('strong').previousSibling.lower()
             if " :" in key:
+                key.replace(" :", "")
+            elif ": " in key:
                 key.replace(": ", "")
-            if "m²" in key:
-                key.replace("m²", "m/2")
-            if "m²" in a:
-                a.replace("m²", "m/2")
+            if "área útil" in key:
+                key="área útil (m/2)"
+            elif "área bruta" in key:
+                key="área bruta (m/2)"
+            elif "área de terreno" in key:
+                key="área de terreno (m/2)"
+            elif "área" in key:
+                key="área (m/2)"
             value=a
             if value is not None:
                 features[key]=value
@@ -113,14 +128,12 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         for li in ul:
             key=li.getText().lower()
             if " :" in key:
+                key.replace(" :", "")
+            elif ": " in key:
                 key.replace(": ", "")
-            if "m²" in key:
-                key.replace("m²", "m/2")
-            if "m²" in a:
-                a.replace("m²", "m/2")
             value="True"
             features[key]=value
-    print(features.get("Freguesia", None))
+    
     obj = df.append({'Nome': nome.text, 'Preço': preco.group(0), 'Preço m/2': precom2.group(0), 'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
                     'Freguesia': features.get("Freguesia", None), 'Tipologia': features.get("tipologia", None), 'Nº Casas de Banho': features.get("casas de banho", None),
                     'Área útil m/2': features.get("área útil (m/2)", None), 'Área bruta m/2': features.get("área bruta (m/2)", None),
@@ -129,7 +142,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
                     'Lareira': features.get("lareira", None), 'Marquise': features.get("marquise", None), 'Suite': features.get("suite", None), 'Varanda': features.get("varanda", None),
                     'Vista de cidade': features.get("vista de cidade", None), 'Condição': features.get("condição", None), 'Despensa': features.get("despensa", None),
                     'Arrecadação': features.get("arrecadação", None), 'Porta blindada': features.get("porta blindada", None), 'Video Porteiro': features.get("video porteiro", None),
-                    'Empreendimento': features.get("empreendimento", None), 'Ar Condicionado': features.get("ar condicionado", None), 'Elevador': features.get("elevador", None),
+                    'Empreendimento': features.get("empreendimento", None), 'Ar condicionado': features.get("ar condicionado", None), 'Elevador': features.get("elevador", None),
                     'Estores elétricos': features.get("estores elétricos", None), 'Fibra ótica': features.get("fibra óptica", None),
                     'Pré-instalação de ar condicionado': features.get("pré-instalação de ar condicionado", None), 'Terraço': features.get("terraço", None), 'Área de terreno m/2': features.get("área de terreno", None),
                     'Churrasco': features.get("churrasco", None), 'Árvores de fruto': features.get("árvores de fruto", None), 'Sotão': features.get("sotão", None),
@@ -167,34 +180,35 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
                     'Adaptado a mobilidade reduzida': features.get("adaptado a mobilidade reduzida", None), 'Terra batida': features.get("terra batida", None),
                     'Video vigilância': features.get("video vigilância", None), 'Espaço frigorífico': features.get("espaço frigorífico", None),
                     'Espaço para arrumação': features.get("espaço para arrumação", None), 'Casa de banho partilhada': features.get("casa de banho partilhada", None),
-                    'Poço': features.get("poço", None), 'Sótão': features.get("sótão", None), 'Paisagem protegida': features.get("paisagem protegida", None)
-                    }, ignore_index=True)
+                    'Poço': features.get("poço", None), 'Sótão': features.get("sótão", None), 'Paisagem protegida': features.get("paisagem protegida", None)}, ignore_index=True)    
 
     obj.to_csv('dados_imovirtual.csv', mode='a', header=False, index=False)
-    
 
 def main():
 
     i = 1
     dictio={}
     while(1):
+
+        # Final das páginas
+        if i == 218:
+            break
+
         # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
         htmlBraga = f"https://www.imovirtual.com/comprar/braga/?search%5Bregion_id%5D=3&search%5Bsubregion_id%5D=36&page={i}"
 
         print(htmlBraga)
 
-        # Final das páginas
-        if i == 223:
-            break
+        
 
         # Realizar o parsing da página associada ao iterador do ciclo
         soup = parseHTML(htmlBraga)
 
         # Encontrar o link de cada imóvel presente na página, através do id associado
         container = soup.find_all(
-            'article', id=re.compile("offer-item-ad_id.*"))
+            'article', id=re.compile("offer-item-ad_id[0-9a-zA-Z]*"))
 
-        # print(container)
+        #print(container)
 
         # Para cada link do imóvel presente no imóvel, ir buscar as features associadas a esse através do método imovelFeatures(imovel)
         for tableCode in container:
@@ -206,7 +220,7 @@ def main():
 
         # Aumentar o iterador associado às páginas
         i = i+1
-    #print(dictio)
+    #print(dictio.keys())
 
 
 main()
