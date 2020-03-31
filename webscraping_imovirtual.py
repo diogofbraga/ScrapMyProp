@@ -67,15 +67,13 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     p=soup.find('div', {"class": "css-1vr19r7"})
     if p is not None:
         preco=re.match("[0123456789 ]+", p.getText())
-    else:
-        preco=None
+        preco=preco.group(0)
     
     
     pm2=soup.find('div', {"class": "css-zdpt2t"})
     if pm2 is not None:
         precom2=re.match("[0123456789 ]+", pm2.getText())
-    else:
-        precom2=None
+        precom2=precom2.group(0)
     
     propriedades=soup.find('div', {"class": "css-2fnk9o"})
     if propriedades is not None:
@@ -134,7 +132,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             value="True"
             features[key]=value
     
-    obj = df.append({'Nome': nome.text, 'Preço': preco.group(0), 'Preço m/2': precom2.group(0), 'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
+    obj = df.append({'Nome': nome.text, 'Preço': preco, 'Preço m/2': precom2, 'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
                     'Freguesia': features.get("Freguesia", None), 'Tipologia': features.get("tipologia", None), 'Nº Casas de Banho': features.get("casas de banho", None),
                     'Área útil m/2': features.get("área útil (m/2)", None), 'Área bruta m/2': features.get("área bruta (m/2)", None),
                     'Ano construção': features.get("ano de construção", None), 'Certificado energético': features.get("certificado energético", None),
