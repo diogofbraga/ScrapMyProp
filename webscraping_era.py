@@ -110,14 +110,15 @@ def main():
     i = 1
 
     while(1):
+
+        # Final das páginas
+        if i == 49:
+            break
+
         # Url das páginas da 'Era.pt', aceder num ciclo às páginas existentes
         htmlBraga = f"https://www.era.pt/imoveis/comprar/-/braga/braga?pg={i}"
 
         print(htmlBraga)
-
-        # Final das páginas
-        if i == 48:
-            break
 
         # Realizar o parsing da página associada ao iterador do ciclo
         soup = parseHTML(htmlBraga)
