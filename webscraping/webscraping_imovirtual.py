@@ -191,7 +191,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
 def main():
 
-    i = 196
+    i = 1
     dictio = {}
     while(1):
 
