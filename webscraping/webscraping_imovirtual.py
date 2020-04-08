@@ -201,7 +201,8 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         iden = ident.find("br")
         if iden is not None:
             ide = iden.previousSibling.split(": ")[1]
-            # print(ide)
+    else:
+        ide= None
 
     features = {}
 
@@ -213,7 +214,6 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
                 key = key.replace(" :", "")
             elif ": " in key:
                 key = key.replace(": ", "")
-                # print(key)
             if "área útil" in key:
                 key = "área útil (m/2)"
             elif "área bruta" in key:
@@ -223,7 +223,6 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             elif "área" in key:
                 key = "área (m/2)"
             value = a
-            # print(key)
             if value is not None:
                 features[key] = value
 
