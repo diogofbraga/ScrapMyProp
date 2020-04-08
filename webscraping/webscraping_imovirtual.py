@@ -6,7 +6,7 @@ import pandas as pd
 # Headers for request
 
 # CSV Header
-df = pd.DataFrame([], columns=['Nome', 'Preço', 'Preço m/2', 'Distrito', 'Concelho', 'Freguesia', 'Tipologia', 'Nº Casas de Banho', 'Área útil m/2', 'Área bruta m/2',
+df = pd.DataFrame([], columns=['Nome', 'Id', 'Tipo de imóvel', 'Preço', 'Preço m/2', 'Distrito', 'Concelho', 'Freguesia', 'Tipologia', 'Nº Casas de Banho', 'Área útil m/2', 'Área bruta m/2',
                                'Ano construção', 'Certificado energético', 'Armário', 'Cozinha equipada', 'Garagem box', 'Gás canalizado', 'Lareira', 'Marquise',
                                'Suite', 'Varanda', 'Vista de cidade', 'Condição', 'Despensa', 'Arrecadação', 'Porta blindada', 'Video Porteiro', 'Empreendimento',
                                'Ar condicionado', 'Elevador', 'Estores elétricos', 'Fibra ótica', 'Pré-instalação de ar condicionado', 'Terraço', 'Área de terreno m/2',
@@ -89,6 +89,14 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         prs = propriedades.find('ul')
         if prs is not None:
             pr = prs.find_all('li')
+            
+    ident= soup.find('div', {'class': 'css-kos6vh'})
+    if ident is not None:
+        iden=ident.find('br')
+        if iden is not None:
+            ide=iden.previousSibling.split(": ")[1]
+            print(ide)
+        
 
     features = {}
 
@@ -97,9 +105,10 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             a = li.find('strong').getText()
             key = li.find('strong').previousSibling.lower()
             if " :" in key:
-                key.replace(" :", "")
+                key=key.replace(" :", "")
             elif ": " in key:
-                key.replace(": ", "")
+                key=key.replace(": ", "")
+                print(key)
             if "área útil" in key:
                 key = "área útil (m/2)"
             elif "área bruta" in key:
@@ -109,6 +118,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             elif "área" in key:
                 key = "área (m/2)"
             value = a
+            print(key)
             if value is not None:
                 features[key] = value
 
@@ -116,6 +126,9 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     if local is not None:
         locais = local.find_all('li')
         if locais is not None:
+            key = "Tipo de imóvel"
+            value = locais[1].find('a').getText().split(" ")[0]
+            print(value)
             key = "Distrito"
             value = locais[2].find('a').getText()
             features[key] = value
@@ -132,13 +145,14 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         for li in ul:
             key = li.getText().lower()
             if " :" in key:
-                key.replace(" :", "")
+                key=key.replace(" :", "")
             elif ": " in key:
-                key.replace(": ", "")
+                key=key.replace(": ", "")
             value = "True"
             features[key] = value
 
-    obj = df.append({'Nome': nome, 'Preço': preco, 'Preço m/2': precom2, 'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
+    obj = df.append({'Nome': nome, 'Id': ide, 'Tipo de imóvel': features.get("Tipo de imóvel", None), 'Preço': preco, 'Preço m/2': precom2, 
+                     'Distrito': features.get("Distrito", None), 'Concelho': features.get("Concelho", None),
                      'Freguesia': features.get("Freguesia", None), 'Tipologia': features.get("tipologia", None), 'Nº Casas de Banho': features.get("casas de banho", None),
                      'Área útil m/2': features.get("área útil (m/2)", None), 'Área bruta m/2': features.get("área bruta (m/2)", None),
                      'Ano construção': features.get("ano de construção", None), 'Certificado energético': features.get("certificado energético", None),
