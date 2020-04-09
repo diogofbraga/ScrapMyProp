@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import requests
 import pandas as pd
+import time
 
 # Headers for request
 
@@ -232,7 +233,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         if locais is not None:
             key = "Tipo de imóvel"
             value = locais[1].find("a").getText().split(" ")[0]
-            # print(value)
+            features[key]=value
             key = "Distrito"
             value = locais[2].find("a").getText()
             features[key] = value
