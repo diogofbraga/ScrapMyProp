@@ -12,6 +12,7 @@ requests = "*"
 re = "*"
 bs4 = "*"
 scrapy = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"
