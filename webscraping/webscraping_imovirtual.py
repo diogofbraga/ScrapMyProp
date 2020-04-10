@@ -203,7 +203,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         if iden is not None:
             ide = iden.previousSibling.split(": ")[1]
     else:
-        ide= None
+        ide = None
 
     features = {}
 
@@ -233,7 +233,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
         if locais is not None:
             key = "Tipo de imóvel"
             value = locais[1].find("a").getText().split(" ")[0]
-            features[key]=value
+            features[key] = value
             key = "Distrito"
             value = locais[2].find("a").getText()
             features[key] = value
@@ -413,12 +413,12 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
 def main():
 
-    i = 1
+    i = 165
     dictio = {}
     while 1:
 
         # Final das páginas
-        if i == 230:
+        if i == 236:
             break
 
         # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
