@@ -13,6 +13,7 @@ df = pd.DataFrame(
         "Nº Estacionamentos",
         "Área Útil",
         "Área Terreno",
+        "Certificado Energia",
         "Finalidade",
         "Tipo de Imóvel",
         "Estado",
@@ -72,6 +73,12 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             if value is not None:
                 features[key] = value.getText()
 
+    icon_certificado = soup.find("span", class_="icon-imovel-certificado")
+    if icon_certificado is not None:
+        cert_energia = icon_certificado["title"]
+    else:
+        cert_energia = None
+
     # ------ Características adicionais ------
     # Método de webscraping: cada característica tinha um id associado, portanto estas características fui diretamente pelo id
     finalidade = soup.find(id="ctl00_ContentPlaceHolder1_lbl_imovel_show_finalidade")
@@ -116,6 +123,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             "Nº Estacionamentos": features.get("Estacionamento", None),
             "Área Útil": features.get("Área Útil", None),
             "Área Terreno": features.get("Área Terreno", None),
+            "Certificado Energia": cert_energia,
             "Finalidade": finalidade.text,
             "Tipo de Imóvel": tipoDeImovel.text,
             "Estado": estado.text,
