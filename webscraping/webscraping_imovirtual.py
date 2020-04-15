@@ -3,6 +3,7 @@ import re
 import requests
 import pandas as pd
 import time
+import json
 
 # Headers for request
 
@@ -19,6 +20,8 @@ df = pd.DataFrame(
         "Concelho",
         "Freguesia",
         "Rua",
+        "Latitude",
+        "Longitude",
         "Tipologia",
         "Nº Casas de Banho",
         "Área útil m/2",
@@ -204,7 +207,24 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             ide = iden.previousSibling.split(": ")[1]
     else:
         ide = None
-
+    
+    jsonstr = soup.find("script", {"type":"application/json", "id": "server-app-state"})
+    lat=None
+    long=None
+    if jsonstr is not None:
+        jsonobj=json.loads(jsonstr.getText())
+        if jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["latitude"] is not None and jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["longitude"] is not None:
+            lat = jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["latitude"]
+            long = jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["longitude"]
+    else:
+        jsonstrs= soup.find_all("script", {"type": "application/ld+json"})
+        if jsonstrs is not None:
+            for x in jsonstrs:
+                jsonobj=json.loads(jsonstrs[x].getText())
+                if jsonobj["@graph"][0]["geo"]["latitude"] is not None and jsonobj["@graph"][0]["geo"]["longitude"]:
+                    lat = jsonobj["@graph"][0]["geo"]["latitude"]
+                    long = jsonobj["@graph"][0]["geo"]["longitude"]
+    
     features = {}
 
     if propriedades is not None:
@@ -271,6 +291,8 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             "Concelho": features.get("Concelho", None),
             "Freguesia": features.get("Freguesia", None),
             "Rua": features.get("Rua", None),
+            "Latitude": lat,
+            "Longitude": long,
             "Tipologia": features.get("tipologia", None),
             "Nº Casas de Banho": features.get("casas de banho", None),
             "Área útil m/2": features.get("área útil (m/2)", None),
@@ -413,7 +435,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
 def main():
 
-    i = 165
+    i = 1
     dictio = {}
     while 1:
 
