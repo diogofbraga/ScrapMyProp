@@ -207,7 +207,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             ide = iden.previousSibling.split(": ")[1]
     else:
         ide = None
-    
+
     jsonstr = soup.find("script", {"type":"application/json", "id": "server-app-state"})
     lat=None
     long=None
@@ -224,7 +224,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
                 if jsonobj["@graph"][0]["geo"]["latitude"] is not None and jsonobj["@graph"][0]["geo"]["longitude"]:
                     lat = jsonobj["@graph"][0]["geo"]["latitude"]
                     long = jsonobj["@graph"][0]["geo"]["longitude"]
-    
+
     features = {}
 
     if propriedades is not None:
@@ -440,7 +440,7 @@ def main():
     while 1:
 
         # Final das páginas
-        if i == 236:
+        if i == 239:
             break
 
         # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
