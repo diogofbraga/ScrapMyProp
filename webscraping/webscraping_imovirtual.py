@@ -435,12 +435,12 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
 def main():
 
-    i = 1
+    i = 110
     dictio = {}
     while 1:
 
         # Final das páginas
-        if i == 225:
+        if i == 237:
             break
 
         # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
