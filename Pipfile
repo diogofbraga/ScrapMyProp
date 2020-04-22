@@ -13,6 +13,7 @@ re = "*"
 bs4 = "*"
 scrapy = "*"
 numpy = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.7"
