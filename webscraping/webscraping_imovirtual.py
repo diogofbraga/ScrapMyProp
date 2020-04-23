@@ -265,8 +265,9 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
             features[key] = value
             if len(locais) > 5:
                 key = "Rua"
-                value = locais[5].find("a").getText()
-                features[key] = value
+                value = locais[5].find("a")
+                if value is not None:
+                    features[key] = value.getText()
 
     caracteristicas = soup.find("div", {"class": "css-1bpegon"})
     if caracteristicas is not None:
@@ -435,7 +436,7 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
 
 def main():
 
-    i = 110
+    i = 1
     dictio = {}
     while 1:
 
