@@ -213,9 +213,11 @@ def imovelFeatures(soup):  # Extração das features da págima dum imóvel
     long=None
     if jsonstr is not None:
         jsonobj=json.loads(jsonstr.getText())
-        if jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["latitude"] is not None and jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["longitude"] is not None:
-            lat = jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["latitude"]
-            long = jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["longitude"]
+        if "initialProps" in jsonobj["initialProps"]:
+            if "data" in jsonobj["initialProps"]:
+                if jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["latitude"] is not None and jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["longitude"] is not None:
+                    lat = jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["latitude"]
+                    long = jsonobj["initialProps"]["data"]["advert"]["location"]["coordinates"]["longitude"]
     else:
         jsonstrs= soup.find_all("script", {"type": "application/ld+json"})
         if jsonstrs is not None:
