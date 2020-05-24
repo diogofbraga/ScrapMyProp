@@ -160,7 +160,7 @@ def main():
     while 1:
 
         # Final das páginas
-        if i == 48:
+        if i == 41:
             break
 
         # Url das páginas da 'Era.pt', aceder num ciclo às páginas existentes
