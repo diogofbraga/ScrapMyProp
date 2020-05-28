@@ -444,7 +444,7 @@ def main():
     while 1:
 
         # Final das páginas
-        if i == 245:
+        if i == 215:
             break
 
         # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
