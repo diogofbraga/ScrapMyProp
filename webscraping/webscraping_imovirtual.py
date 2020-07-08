@@ -444,11 +444,11 @@ def main():
     while 1:
 
         # Final das páginas
-        if i == 29:
+        if i == 227:
             break
 
         # Url das páginas de apartamentos da 'Sapo.pt', aceder num ciclo às páginas existentes
-        htmlBraga = f"https://www.imovirtual.com/arrendar/braga/?search%5Bregion_id%5D=3&search%5Bsubregion_id%5D=36&page={i}"
+        htmlBraga = f"https://www.imovirtual.com/comprar/braga/?search%5Bregion_id%5D=3&search%5Bsubregion_id%5D=36&page={i}"
 
         print(htmlBraga)
 
